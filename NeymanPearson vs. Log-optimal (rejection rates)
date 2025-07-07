@@ -1,0 +1,43 @@
+set.seed(123)  # for reproducibility
+
+# Parameters
+alpha <- 0.05
+n_sim <- 10000 
+
+# Thresholds
+z_1_alpha <- qnorm(1 - alpha)  # z_{1-alpha}
+threshold_phi1 <- exp(z_1_alpha - 0.5)
+threshold_phi2 <- 1 / alpha
+
+# Likelihood ratio function: dN(1,1)/dN(0,1)
+likelihood_ratio <- function(x) {
+  dnorm(x, mean = 1, sd = 1) / dnorm(x, mean = 0, sd = 1) 
+}
+
+# Simulate under H0: X ~ N(0,1)
+samples_H0 <- rnorm(n_sim, mean = 0, sd = 1)
+LR_H0 <- likelihood_ratio(samples_H0)
+
+# Evaluate rejection rates (under H0)
+rejections_phi1_H0 <- mean(LR_H0 > threshold_phi1)
+rejections_phi2_H0 <- mean(LR_H0 > threshold_phi2)
+sizeapprox_phi2_H0 <- mean(LR_H0) * alpha  
+
+# Simulate under H1: X ~ N(1,1)
+samples_H1 <- rnorm(n_sim, mean = 1, sd = 1)
+LR_H1 <- likelihood_ratio(samples_H1)
+
+# Evaluate rejection rates (under H1)
+rejections_phi1_H1 <- mean(LR_H1 > threshold_phi1)
+rejections_phi2_H1 <- mean(LR_H1 > threshold_phi2)
+
+# Print results
+cat("---- Results ----\n")
+cat("Under H0 (X ~ N(0,1)):\n")
+cat(sprintf("phi1: Empirical size (rejection rate) = %.4f\n", rejections_phi1_H0)) 
+cat(sprintf("phi2: Rejection rate = %.4f\n", rejections_phi2_H0))
+cat(sprintf("phi2: Empirical size = %.4f\n", sizeapprox_phi2_H0))
+
+cat("\nUnder H1 (X ~ N(1,1)):\n")
+cat(sprintf("phi1: Rejection rate = %.4f\n", rejections_phi1_H1)) 
+cat(sprintf("phi2: Rejection rate = %.4f\n", rejections_phi2_H1))
