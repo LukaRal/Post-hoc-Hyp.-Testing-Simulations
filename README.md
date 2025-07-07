@@ -1,4 +1,8 @@
 # Post-hoc-Hyp.-Testing-Simulations
 
-This repository contains the codes that are used to produce the results and figures contained in my Bachelor Thesis "Post-hoc alpha Hypothesis Testing and post-hoc p-values".
+This repository contains the codes that are used to produce the results and figures contained in my Bachelor Thesis "Post-hoc alpha Hypothesis Testing and post-hoc p-values". All distinct results are in seperate files and can be run in R directly by copying and pasting the code.
+
+The file "NeymanPearson vs. Log-optimal (rejection rates)" contains the code which produces numerical results of a simulation, where we compare the rejection rates over 10'000 data samples of two distinct test functions for a fixed level alpha = 0.05. Once under the null hypothesis and once under the alternative. The null hypothesis is that the data follows a standard normal distribution, while the alternative is that it follows a N(1,1) distribution. The two test functions that we compare are given by the Neyman-Pearson test (most powerful test in the traditional hypothesis testing setting) and the test function given by the log-optimal p-value, which we cover in the Thesis in detail.
+
+The file "NeymanPearson vs. Log-optimal (Plot: Histogram of likelihood ratios)" contains a code that produces a plot, which illustrates a histogram related to the same simulation as for "NeymanPearson vs. Log-optimal (rejection rates)". The histogram represents how many sample points are counted (y-axis) for each value of the likelihood ratio (x-axis), which is plotted in a log-scale. The plot also shows the rejection thresholds of the two tests we are comparing and colors the count of rejected samples for each test.
 
