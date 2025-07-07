@@ -1,0 +1,86 @@
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+
+if (!requireNamespace("latex2exp", quietly = TRUE)) {
+  install.packages("latex2exp")
+}
+
+library(ggplot2)
+library(latex2exp)
+
+# Parameters
+alpha <- 0.05
+n_sim <- 10000 
+
+# Thresholds
+z_1_alpha <- qnorm(1 - alpha)  # z_{1-alpha}
+threshold_phi1 <- exp(z_1_alpha - 0.5)
+threshold_phi2 <- 1 / alpha
+
+# Likelihood ratio function: dN(1,1)/dN(0,1)
+likelihood_ratio <- function(x) {
+  dnorm(x, mean = 1, sd = 1) / dnorm(x, mean = 0, sd = 1) 
+}
+
+# Simulate under H0: X ~ N(0,1)
+samples_H0 <- rnorm(n_sim, mean = 0, sd = 1)
+LR_H0 <- likelihood_ratio(samples_H0) 
+
+# Simulate under H1: X ~ N(1,1)
+samples_H1 <- rnorm(n_sim, mean = 1, sd = 1)
+LR_H1 <- likelihood_ratio(samples_H1)
+
+# Create nice breaks including thresholds
+breaks <- sort(unique(c(
+  0.1, 1, 10, 100,  
+  signif(threshold_phi1, 3), 
+  signif(threshold_phi2, 3)
+)))
+
+# Labels with names for threshold points
+labels <- sapply(breaks, function(b) {
+  if (abs(b - signif(threshold_phi1, 3)) < 1e-6) {
+    return(TeX("$c_1 = 3.14$"))
+  } else if (abs(b - signif(threshold_phi2, 3)) < 1e-6) {
+    return(TeX("$c_2 = 20$"))
+  } else {
+    return(as.character(b))
+  }
+})
+
+# Add rejection labels for H1 samples
+df_H1 <- data.frame(
+  LR = LR_H1, 
+  Source = "H1",
+  Rejection = factor(
+    ifelse(LR_H1 > threshold_phi2, "Reject by phi2",
+           ifelse(LR_H1 > threshold_phi1, "Reject by phi1", "Not rejected")),
+    levels = c("Reject by phi2", "Reject by phi1", "Not rejected")
+  )
+)
+
+# Plot
+ggplot(df_H1, aes(x = LR, fill = Rejection)) +
+  geom_histogram(bins = 100, alpha = 0.7, position = "identity") +
+  scale_x_log10(breaks = breaks, labels = labels) + 
+  scale_fill_manual(
+  values = c(
+    "Reject by phi2" = "red",
+    "Reject by phi1" = "orange",
+    "Not rejected" = "grey70"
+  ),
+  labels = c(
+    "Reject by phi2" = TeX("Reject by $\\phi$"),
+    "Reject by phi1" = TeX("Reject by $\\phi^{LR}$"),
+    "Not rejected"   = "Not rejected"
+  )
+) + 
+  geom_vline(xintercept = threshold_phi1, linetype = "dashed", color = "orange", size = 1) +
+  geom_vline(xintercept = threshold_phi2, linetype = "dashed", color = "red", size = 1) +
+  labs(title = "", 
+       subtitle = "",
+       x = "Likelihood Ratio (log scale)",
+       y = "Count",
+       fill = "Rejection decision") +
+  theme_minimal()
