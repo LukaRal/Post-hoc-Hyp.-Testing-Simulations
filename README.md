@@ -6,3 +6,4 @@ The file "NeymanPearson vs. Log-optimal (rejection rates)" contains the code whi
 
 The file "NeymanPearson vs. Log-optimal (Plot: Histogram of likelihood ratios)" contains a code that produces a plot, which illustrates a histogram related to the same simulation as for "NeymanPearson vs. Log-optimal (rejection rates)". The histogram represents how many sample points are counted (y-axis) for each value of the likelihood ratio (x-axis), which is plotted in a log-scale. The plot also shows the rejection thresholds of the two tests we are comparing and colors the count of rejected samples for each test.
 
+The file "Plotting behavior of P_n for log-optimal p" contains a code that plots two graphs, which illustrate how P_n behaves as the sample size n increases. Here P_n is the cummulative product of i.i.d. log-optimal post-hoc p-values. In the thesis we discuss the theoretical meaning of this behavior in detail. 
