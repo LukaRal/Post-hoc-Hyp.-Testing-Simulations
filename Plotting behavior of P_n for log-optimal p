@@ -1,0 +1,67 @@
+set.seed(123)
+
+# Parameters
+n <- 500  # number of sequential samples
+
+# Simulate data under the alternative: N(1, 1)
+x <- rnorm(n, mean = 1, sd = 1) 
+
+# Likelihood ratio p-values (Log-optimal) under alternative
+opt_p_alt <- exp(0.5 - x)
+log_p_alt <- log(opt_p_alt)
+log_cumprod_p_alt <- cumsum(log_p_alt)
+log_shrinkage_rate_alt <- log_cumprod_p_alt / (1:n)
+
+
+# Install packages if necessary
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+if (!requireNamespace("patchwork", quietly = TRUE)) {
+  install.packages("patchwork")
+}
+
+# Load packages
+library(ggplot2)
+library(patchwork)
+
+
+# Prepare data
+df_cumprod <- data.frame(
+  n = 1:length(log_cumprod_p_alt),
+  log_product = log_cumprod_p_alt
+)
+
+# ggplot version of the first plot
+p1 <- ggplot(df_cumprod, aes(x = n, y = log_product)) +
+  geom_line(color = "blue", linewidth = 1) +
+  labs(
+    title = expression(paste(P[n], " for log-optimal p")),
+    x = "Sample size n",
+    y = expression(paste("log(", P[n], ")"))
+  ) +
+  theme_minimal()
+
+
+# Prepare data
+df_shrinkage <- data.frame(
+  n = 1:length(log_shrinkage_rate_alt),
+  shrinkage_rate = log_shrinkage_rate_alt
+)
+
+# Compute mean shrinkage rate
+mean_shrinkage <- mean(log_p_alt)
+
+# ggplot version of the second plot
+p2 <- ggplot(df_shrinkage, aes(x = n, y = shrinkage_rate)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_hline(yintercept = mean_shrinkage, color = "blue", linetype = "dashed") +
+  labs(
+    title = expression(paste("Log growth rate of ", P[n], " under ", H[1])),
+    x = "Sample size n",
+    y = expression(paste("Average ", log(P[n])))
+  ) +
+  theme_minimal()
+
+combined_plot <- p1 + p2  # Side by side
+print(combined_plot)
